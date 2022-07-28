@@ -1,4 +1,4 @@
-# personal-book-web
+# personalweb
 
 ## Project setup
 ```

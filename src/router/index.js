@@ -5,14 +5,26 @@ import { createWebHistory, createRouter } from 'vue-router'
 
 const history = createWebHistory()
 
-export const router = createRouter({
-    history, // 路由模式
-    routes: [
+
+const routes = [
       {
         // 页面逻辑
         path: '/',
         name: 'login',
         component: () => import('@/views/login/index')
+      },
+      {
+        // 页面逻辑
+        path: '/register',
+        name: 'register',
+        component: () => import('@/views/login/index')
       }
     ]
+
+
+  export const router = createRouter({
+    history: history,
+    routes: routes
   })
+   
+  export default router
