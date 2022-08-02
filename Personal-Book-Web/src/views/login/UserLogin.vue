@@ -1,145 +1,126 @@
 <template>
-   <div>
+   <el-container>
       <el-card class="login-form-layout">
-         <el-form autoComplete="on"  label-position="left">
+         <el-form :model="loginForm" label-position="left">
             <div style="text-align: center">
-               <svg-icon icon-class="login-mall" style="width: 56px;height: 56px;color: #409EFF"></svg-icon>
+               <svg-icon name="integral"
+                  style="width: 56px;height: 56px;color: #1296db"></svg-icon>
             </div>
             <h2 class="login-title color-main">Personal-Book</h2>
             <el-form-item prop="username">
-               <el-input name="username" type="text" autoComplete="on"
-                  placeholder="请输入用户名">
-                  <!-- <span slot="prefix"> -->
-                     <svg-icon icon-class="user" class="color-main"></svg-icon>
-                  <!-- </span> -->
+               <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="请输入用户名"
+                  prefix-icon="UserFilled">
                </el-input>
             </el-form-item>
             <el-form-item prop="password">
-               <el-input name="password" 
-                  autoComplete="on" placeholder="请输入密码">
-                  <!-- <span slot="prefix"> -->
-                     <svg-icon icon-class="password" class="color-main"></svg-icon>
-                  <!-- </span> -->
-                  <!-- <span slot="suffix"> -->
-                     <svg-icon icon-class="eye" class="color-main"></svg-icon>
-                  <!-- </span> -->
+               <el-input name="password" type="password" v-model="loginForm.password" autoComplete="on"
+                  placeholder="请输入密码" show-password prefix-icon="Lock">
                </el-input>
             </el-form-item>
             <el-form-item style="margin-bottom: 60px;text-align: center">
-               <el-button style="width: 50%;align-content: center;" type="primary">
+               <el-button style="width: 45%" type="primary">
+                  注册
+               </el-button>
+               <el-button style="width: 45% ; text-align: center;" type="primary" :loading="loading" @click="jumpPage">
                   登录
                </el-button>
             </el-form-item>
          </el-form>
       </el-card>
-   </div>
+      <!-- <img :src="login_center_bg" class="login-center-layout" /> -->
+   </el-container>
 </template>
 
 
-<script lang="ts" setup>
-import { reactive } from 'vue'
+<script setup>
+import { reactive, ref, onMounted } from 'vue'
+import login_center_bg from '@/assets/images/login_center_bg.png'
+import { useRouter } from "vue-router"  // 引入userRouter
 
-// do not use same name with ref
-const form = reactive({
-   name: '',
-   region: '',
-   date1: '',
-   date2: '',
-   delivery: false,
-   type: [],
-   resource: '',
-   desc: '',
+//数据区域
+const loginForm = reactive({
+   username: '',
+   password: '',
+})
+const validateUsername = (rule, value, callback) => {
+   if (value.length > 100) {
+      callback(new Error('请输入正确的用户名'))
+   } else {
+      callback()
+   }
+};
+const validatePass = (rule, value, callback) => {
+   if (value.length < 3) {
+      callback(new Error('密码不能小于3位'))
+   } else {
+      callback()
+   }
+};
+const loginRules = reactive({
+   username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+   password: [{ required: true, trigger: 'blur', validator: validatePass }]
 })
 
-const onSubmit = () => {
-   console.log('submit!')
+const LoginForm = ref(null)
+const pwdType = ref('password')
+const loading = ref(false)
+const router = useRouter()
+
+
+// onMounted(()=>{
+
+// })
+//方法区
+function showPwd() {
+   if (pwdType.value === 'password') {
+      pwdType.value = ''
+   } else {
+      pwdType.value = 'password'
+   }
+}
+
+function jumpPage(){
+   router.push({path: '/test'})
+
 }
 </script>
-   import qs from 'qs'
-   export default {
-      name: "Login",
-      data() {
-         return {
-            loginForm: {
-               username: 'admin',
-               password: 'markerhub',
-               code: '11111',
-               token: '',
-            },
-            rules: {
-               username: [
-                  {required: true, message: '请输入用户名', trigger: 'blur'}
-               ],
-               password: [
-                  {required: true, message: '请输入密码', trigger: 'blur'}
-               ],
-               code: [
-                  {required: true, message: '请输入验证码', trigger: 'blur'},
-                  {min: 5, max: 5, message: '验证码为5个字符', trigger: 'blur'}
-               ],
-            },
-            captchaImg: ''
-         }
-      },
-      methods: {
-         submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-               if (valid) {
-                  this.$axios.post('/login?' + qs.stringify(this.loginForm)).then(res => {
-                     console.log(res.data)
-                     const jwt = res.headers['authorization']
-                     // 将jwt存储到应用store中
-                     this.$store.commit("SET_TOKEN", jwt)
-                     this.$router.push("/index")
-                  }).catch(error => {
-                     this.getCaptcha();
-                     console.log('error submit!!');
-                  })
-               } else {
-                  this.getCaptcha();
-                  console.log('error submit!!');
-                  return false;
-               }
-            });
-         },
-         resetForm(formName) {
-            this.$refs[formName].resetFields();
-         },
-         getPass() {
-            this.$message("请扫描左边的二维码，回复【VueAdmin】获取登录密码");
-         },
-         getCaptcha() {
-            this.$axios.get('/captcha').then(res => {
-               this.loginForm.token = res.data.data.token
-               this.captchaImg = res.data.data.captchaImg
-            })
-         }
-      },
-      created() {
-         this.getCaptcha()
-      }
-   }
+
 
 <style scoped>
- .login-form-layout {
-    position: absolute;
-    left: 0;
-    right: 0;
-    width: 360px;
-    margin: 140px auto;
-    border-top: 10px solid #409EFF;
-  }
+.mainclass{
+    background-image: url("../../assets/images/login_center_bg.png");;
+}
+.login-form-layout {
+   /* position: absolute;
+   left: 0;
+   right: 0;
+   width: 360px;
+   margin: 140px auto;
+   border-top: 10px solid #409EFF; */
+   text-align: center;
+   width: 360px;
+   border-top: 10px solid #1296db;
+   position: absolute;
+   left: 50%;
+   top: 50%;
+   transform: translate(-50%, -50%);
+}
 
-  .login-title {
-    text-align: center;
-  }
+.login-title {
+   text-align: center;
+}
 
-  .login-center-layout {
-    background: #409EFF;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    margin-top: 200px;
-  }
+.login-center-layout {
+   background: #409EFF;
+   width: auto;
+   height: auto;
+   max-width: 100%;
+   max-height: 100%;
+   margin-top: 200px;
+}
+
+.el-row {
+   margin-bottom: 20px;
+   height: 800px;
+}
 </style>
